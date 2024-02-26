@@ -1,0 +1,49 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+<style>
+    .jumbotron {
+        background-color: #6c757d;
+        /*background-image: url('https://picsum.photos/1200/600'); /* add a background image */
+        color: #fff;
+        text-shadow: 2px 2px #000;
+        border-radius: 0;
+        padding-top: 8rem; /* add padding to the top of jumbotron */
+        padding-bottom: 8rem; /* add padding to the bottom of jumbotron */
+    }
+
+    h1 {
+        font-size: 4rem; /* increase font size of h2 tag */
+        font-weight: bold; /* make h2 tag bold */
+        margin-bottom: 2rem; /* add margin to the bottom of h2 tag */
+    }
+
+    h4 {
+        font-size: 2rem; /* increase font size of h5 tag */
+        margin-bottom: 2rem; /* add margin to the bottom of h5 tag */
+    }
+</style>
+
+{% include 'includes/header.html' %}
+<div class="jumbotron">
+    <div class="container text-center">
+        <!-- Header with h2 tag -->
+        <h1>BugBite</h1>
+        <!-- Text below header with h5 tag -->
+        <h4>Secure Your Web Application</h4>
+    </div>
+</div>
+  
+  
+  <div class="container">
+    <h2>List of Vulnerabilities</h2>
+    <ul class="list-group">
+      <li class="list-group-item">Cross-site scripting (XSS)</li>
+      <li class="list-group-item">SQL injection</li>
+      <li class="list-group-item">Cross-site request forgery (CSRF)</li>
+      <li class="list-group-item">Insecure direct object references</li>
+      <li class="list-group-item">Security misconfiguration</li>
+    </ul>
+  </div>
+  
+{% endblock content %}

@@ -1,0 +1,30 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+
+
+    {% include 'includes/header.html' %}
+
+    <div class="container">
+      <div class="registration mx-auto d-block w-50">
+        <div class="page-header text-center mt-3">
+          <h1 class="text-primary">Login</h1>
+        </div>
+        
+        <form method="post" class="form-validate form-horizontal well" enctype="multipart/form-data">
+          {% csrf_token %}
+          <fieldset>
+            <div class="form-group">
+              <label for="">UserName</label>
+              {{ form.username }}
+            </div>
+            <div class="form-group">
+              <label for="">Password</label>
+              {{ form.password }}
+            </div>
+                <button type="submit" class="btn btn-primary">login</button>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+    {% endblock content %} 

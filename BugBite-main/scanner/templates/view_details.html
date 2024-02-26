@@ -1,0 +1,429 @@
+{% extends 'includes/base.html' %}
+{% block content %}
+
+    {% include 'includes/uheader.html' %} 
+    <div class="row w-100">
+        <div class="col-md-3 col-lg-2">{% include 'includes/usidebar.html' %}</div>
+        <div class="col-md-9 col-lg-10">
+          <div class="container my-5">
+            <form method="post" action="{% url 'export_pdf' scan.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-primary float-right" type="submit">Export to PDF</button>
+            </form>
+            <div class="row my-4">
+                <div class="col-lg-12">
+                    <h1 class="text-center text-uppercase">{{ scan.projectname }}</h1>
+                    <p class="lead text-muted text-center">{{ scan.description }}</p>
+                </div>
+            </div>
+                {% if target_details %}
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="card bg-light">
+                      <div class="card-header bg-info text-white">
+                        <h2 class="text-center">TARGET DETAILS</h2>
+                      </div>
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <p><strong>Domain Name:</strong> <span class="text-primary">{{ target_details.domain_name }}</span></p>
+                          </div>
+                          <div class="col-md-4">
+                            <p><strong>IP:</strong> <span class="text-danger">{{ target_details.ip }}</span></p>
+                          </div>
+                          <div class="col-md-4">
+                            <p><strong>Report Date:</strong> <span class="text-success">{{ target_details.report_date }}</span></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  {% endif %}
+
+                  {% if os_information %}
+                  <div class="row my-4">
+                      <div class="col-md-12">
+                          <div class="card">
+                              <div class="card-header bg-secondary text-white">
+                                  <h3 class="text-center">OS INFORMATION</h3>
+                              </div>
+                              <div class="card-body">
+                                  <div class="table-responsive">
+                                      <table class="table table-striped table-bordered">
+                                          <thead>
+                                              <tr>
+                                                  <th>OS NAME</th>
+                                                  <th>OS ACCURACY</th>
+                                                  <th>OS FAMILY</th>
+                                                  <th>OS TYPE</th>
+                                                  <th>OS VENDOR</th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                              {% for os in os_information %}
+                                              <tr>
+                                                  <td>{{ os.os_name }}</td>
+                                                  <td>{{ os.accuracy }}</td>
+                                                  <td>{{ os.os_family }}</td>
+                                                  <td>{{ os.os_type }}</td>
+                                                  <td>{{ os.vendor }}</td>
+                                              </tr>
+                                              {% endfor %}
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  {% endif %}
+
+                    {% if service_details %}
+                    <div class="row my-4">
+                      <div class="col-md-12">
+                          <div class="card">
+                              <div class="card-header bg-primary text-white">
+                                  <h3 class="text-center">PORT VULNERABILITY</h3>
+                              </div>
+                        <div class="card-body">
+                          <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                              <thead>
+                              <tr>
+                                  <th style="width: 70px;" >NAME</th>
+                                  <th style="width: 70px;">PORT</th>
+                                  <th>PRODUCT - VERSION</th>
+                                  <th>SCRIPT NAME</th>
+                                  <th>SCRIPT DATA</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                            {% for service in service_details %}
+                            <tr>
+                              {% if service.name %}
+                              <td>{{ service.name }}</td>
+                            {% else %}
+                              <td>Unknown</td>
+                            {% endif %}  
+                            {% if service.port %}
+                              <td>{{ service.port }}</td>
+                            {% else %}
+                              <td>Unknown</td>
+                            {% endif %}  
+                            {% if service.product or service.version %}
+                              <td>{{ service.product|default:"Unknown" }} -  {{ service.version|default:"Unknown" }} </td>
+                            {% else %}
+                              <td>Unknown</td>
+                            {% endif %}
+                            {% if service.script_name %}
+                              <td>{{ service.script_name }}</td>
+                            {% else %}
+                              <td>Unknown</td>
+                            {% endif %}
+                            {% if service.script_data %}
+                              <td>{{ service.script_data }}</td>
+                            {% else %}
+                              <td>Unknown</td>
+                            {% endif %}
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+                </div>
+                  </div>
+                  </div>
+                  </div>
+                </div>
+                  {% endif %}
+
+                  {% if 'sqli_scan' in scan_result_dict %}
+                  <div class="row my-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="text-center text-uppercase">SQL INJECTION</h3>
+                            </div>
+                  <div class="card mt-4">
+                    <div class="card-body text-dark">
+                    <ul class="list-group mb-3">
+                      {% for scan_result in scan_result_dict.sqli_scan %}
+                        <li class="list-group-item">{{ scan_result }}</li>
+                      {% endfor %}
+                      <p class="card-text"><strong class="text-uppercase">Description : </strong><br>SQL injection is a vulnerability that allows an attacker to alter backend SQL statements by manipulating the user input. An SQL injection occurs when web applications accept user input that is directly placed into a SQL statement and doesn\'t properly filter out dangerous characters</p>
+                      <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>An attacker may attack /steal your confidential database, which surely will harm the clients.</p>
+                      <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>Your script should filter metacharacters and not allow any other query to proceed.</p>
+                    </ul>
+                  </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                  {% endif %}
+
+                  {% if 'lfi_scan' in scan_result_dict %}
+                  <div class="row my-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="text-center text-uppercase">LOCAL FILE INCLUSION</h3>
+                            </div>
+                  <div class="card mt-4">
+                    <div class="card-body text-dark">
+                    <ul class="list-group mb-3">
+                      {% for scan_result in scan_result_dict.lfi_scan %}
+                        <li class="list-group-item">{{ scan_result }}</li>
+                      {% endfor %}
+                    </ul>
+                    <p class="card-text"><strong class="text-uppercase">Description : </strong><br>Sanitizing user input, ensure you have a pre-defined list of both expected and acceptable characters.</p>
+                    <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>Gather usernames via/etc/passwd file Harvest useful information from the log files such as /apache/logs/error.log or /apache/logs/access.log Remotely execute commands via combining this vulnerability with some of other attack vectors such as file upload vulnerability or log injection.</p>
+                    <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>If possible, do not permit file paths to be appended directly. Make them hard-coded or selectable from a limited hard-coded path list via an index variable 2 :If you definitely need dynamic path concatenation, ensure that you only accept required characters such as a-Z0-9 and do not allow .., /, %00 (null byte) or any other similar unexpected characters.</p>
+                  </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                  {% endif %}
+
+                  {% if 'xss_scan' in scan_result_dict %}
+                  <div class="row my-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="text-center text-uppercase">CROSS SIDE SCRIPTING (XSS)</h3>
+                            </div>
+                  <div class="card mt-4">
+                    <div class="card-body text-dark">
+                    <ul class="list-group mb-3">
+                      {% for scan_result in scan_result_dict.xss_scan %}
+                        <li class="list-group-item">{{ scan_result }}</li>
+                      {% endfor %}
+                    </ul>
+                    <p class="card-text"><strong class="text-uppercase">Description : </strong><br>Cross-Site Scripting (XSS) attacks are a type of injection, in which malicious scripts are injected into otherwise benign and trusted websites. XSS attacks occur when an attacker uses a web application to send malicious code, generally in the form of a browser side script, to a different end user.</p>
+                    <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>Cross-site scripting (XSS) vulnerabilities continue to remain a major threat to web applications as attackers exploiting XSS attacks can gain control of the user’s account and steal personal information such as passwords, bank account numbers, credit card info, personally identifiable information (PII), social security numbers, and more.</p>
+                    <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>Sanitizing an input field or validating that the data is in the proper form, ensures that only expected content can be submitted by your visitors.</p>
+                  </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                  {% endif %}
+
+                  {% if 'csrf_scan' in scan_result_dict %}
+                  <div class="row my-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="text-center text-uppercase">CSRF</h3>
+                            </div>
+                  <div class="card mt-4">
+                    <div class="card-body text-dark">
+                    <ul class="list-group mb-3">
+                      {% for scan_result in scan_result_dict.csrf_scan %}
+                        <li class="list-group-item">{{ scan_result }}</li>
+                      {% endfor %}
+                    </ul>
+                    <p class="card-text"><strong class="text-uppercase">Description : </strong><br>Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on a web application in which they’re currently authenticated. An attacker may trick the users of a web application into executing actions of the attacker’s choosing.</p>
+                    <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>A successful CSRF attack can force the user to perform state changing requests like transferring funds, changing their email address, and so forth. If the victim is an administrative account, CSRF can compromise the entire web application.</p>
+                    <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>To prevent from csrf attack token(code) should be generated in the backend while filling the form which make sures that token is specific for the authorized users.</p>
+                  </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                  {% endif %}
+
+                  {% if 'dir_trav_scan' in scan_result_dict %}
+                  <div class="row my-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="text-center text-uppercase">Directory traversal</h3>
+                            </div>
+                  <div class="card mt-4">
+                    <div class="card-body text-dark">
+                    <ul class="list-group mb-3">
+                      {% for scan_result in scan_result_dict.dir_trav_scan %}
+                        <li class="list-group-item">{{ scan_result }}</li>
+                      {% endfor %}
+                    </ul>
+                    <p class="card-text"><strong class="text-uppercase">Description : </strong><br>Directory traversal is an attack which allows attackers to access restricted directories and execute commands outside of the web server\'s root directory.</p>
+                    <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>If a web server or web application is vulnerable to directory traversal attack, the attacker can exploit the vulnerability to reach the root directory and access restricted files and directories.</p>
+                    <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>To avoid from getting accessed by the attacker. Message will be displayed of access denied with different error.</p>
+                  </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                  {% endif %}
+
+                  {% if 'url_redir_scan' in scan_result_dict %}
+                  <div class="row my-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="text-center text-uppercase">URL Redirection</h3>
+                            </div>
+
+                  <div class="card mt-4">
+                    <div class="card-body text-dark">
+                      <ul class="list-group mb-3">
+                        {% for scan_result in scan_result_dict.url_redir_scan %}
+                          <li class="list-group-item">{{ scan_result }}</li>
+                        {% endfor %}
+    
+                      </ul>
+                      <p class="card-text"><strong class="text-uppercase">Description : </strong><br> Redirection is a vulnerability which allows an attacker to force users of your application to an untrusted external site.The attack is most often performed by delivering a link to the victim, who then clicks the link and is unknowingly redirected to the malicious website.</p>
+                      <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>URL Redirection attack may assist an attacker to conduct phishing attacks, trojan distribution, spammers.</p>
+                      <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>To minimize the risk of unwanted redirects, avoid user-controllable data in URLs where possible and carefully sanitize it when it must be used.</p>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+                {% endif %}
+              
+                
+                {% if 'iframe_scan' in scan_result_dict %}
+                <div class="row my-4">
+                  <div class="col-md-12">
+                      <div class="card">
+                          <div class="card-header bg-danger text-white">
+                              <h3 class="text-center text-uppercase">Clickjacking</h3>
+                          </div>
+                <div class="card mt-4">
+                  <div class="card-body text-dark">
+                <ul class="list-group mb-3">
+                  {% for scan_result in scan_result_dict.iframe_scan %}
+                    <li class="list-group-item">{{ scan_result }}</li>
+                  {% endfor %}
+                </ul>
+                <p class="card-text"><strong class="text-uppercase">Description : </strong><br>Clickjacking is an attack that tricks a user into clicking a webpage element which is invisible or disguised as another element. This can cause users to unwittingly download malware, visit malicious web pages, provide credentials or sensitive information, transfer money, or purchase products online.</p>
+                <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>It is performed by displaying an invisible page or HTML element, inside an iframe, which can be vulnerable for Clickjacking.</p>
+                <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>To avoid from this attack X-Frame-Options response header is passed as part of the HTTP response of a web page, indicating whether or not a browser should be allowed to render a page inside a FRAME or IFRAME tag.</p>
+              </div>
+            </div>
+            </div>
+            </div>
+            </div>
+              {% endif %}
+
+              {% if 'robots_scan' in scan_result_dict %}
+              <div class="row my-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h3 class="text-center text-uppercase">Robots.txt</h3>
+                        </div>
+              <div class="card mt-4">
+                <div class="card-body text-dark">
+                <ul class="list-group mb-3">
+                  {% for scan_result in scan_result_dict.robots_scan %}
+                    <li class="list-group-item">{{ scan_result }}</li>
+                  {% endfor %}
+                </ul>
+                <p class="card-text"><strong class="text-uppercase">Description : </strong><br>Robots.txt file tells search engine crawlers that which pages or files the crawler can or can\'t request from your site.</p>
+                <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>Web developer or web admin thinks that robots.txt is only to tell web crawlers what to look and what to avoid. But they also have to take care that if the attacker accessed the robots.txt file, he can now easily accessed your main page also.</p>
+                <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>Robot.txt is not a vulnerability, but it is to ensure that administrators should review the contents of the robots.txt file to check if the information is consistent with the policies of their organization.</p>
+      
+              </div>
+            </div>
+            </div>
+            </div>
+            </div>
+              {% endif %}
+
+              
+              {% if 'sitemap_scan' in scan_result_dict %}
+              <div class="row my-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h3 class="text-center text-uppercase">Sitemap</h3>
+                        </div>
+              <div class="card mt-4">
+                <div class="card-body text-dark">
+              <ul class="list-group mb-3">
+                {% for scan_result in scan_result_dict.sitemap_scan %}
+                  <li class="list-group-item">{{ scan_result }}</li>
+                {% endfor %}
+              </ul>
+              <p class="card-text"><strong class="text-uppercase">Description : </strong><br>A sitemap is a file where you provide information about the pages, videos, and other files on your site, and the relationships between them. You can use a sitemap to provide information about specific types of content on your pages, including video and image content.</p>
+              <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>Open Policy Crossdomain.xml file allows other SWF files to make HTTP requests to your web server and see its response. For which using an insecure cross-domain policy file could lead to exploit your site to various attacks.</p>
+              <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>To evaluate which sites will be allowed to make cross-domain calls. Consider network topology and any authentication mechanisms that will be affected by the configuration or implementation of the cross-domain policy.</p>
+    
+            </div>
+          </div>
+          </div>
+          </div>
+          </div>
+            {% endif %}
+
+
+                          
+            {% if 'auto_comp_scan' in scan_result_dict %}
+            <div class="row my-4">
+              <div class="col-md-12">
+                  <div class="card">
+                      <div class="card-header bg-info text-white">
+                          <h3 class="text-center text-uppercase">Auto complete</h3>
+                      </div>
+            <div class="card mt-4">
+              <div class="card-body text-dark">
+            <ul class="list-group mb-3">
+              {% for scan_result in scan_result_dict.auto_comp_scan %}
+                <li class="list-group-item">{{ scan_result }}</li>
+              {% endfor %}
+            </ul>
+            <p class="card-text"><strong class="text-uppercase">Description : </strong><br>Whenever we login/signup with the username and password in any of the form , the browser asks from the user to save it. From this an attacker with local access could obtain the clear text password from the browser cache.</p>
+            <p class="card-text"><strong class="text-uppercase">Impact: </strong><br>The user entered its data in these fields might be sensitive and the attacker can steal them from the browser cache.</p>
+            <p class="card-text"><strong class="text-uppercase">Recommendation: </strong><br>To avoid stealing users\' sensitive data, the password autocomplete should be disabled in sensitive applications. To disable autocomplete, use TYPE=password AUTOCOMPLETE=off</p>
+  
+          </div>
+        </div>
+        </div>
+        </div>
+        </div>
+          {% endif %}
+
+                        
+          {% if 'http_scan' in scan_result_dict %}
+          <div class="row my-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="text-center text-uppercase">HTTP Scan</h3>
+                    </div>
+                    <div class="card mt-4">
+                      <div class="card-body text-dark">
+          <ul class="list-group mb-3">
+            {% for scan_result in scan_result_dict.http_scan %}
+              <li class="list-group-item">{{ scan_result }}</li>
+            {% endfor %}
+          </ul>
+          <p class="card-text"><strong class="text-uppercase">Description : </strong>In terms of security, HTTP is completely fine when browsing the web. It only becomes an issue when you\'re entering sensitive data into form fields on a website. If you\'re entering sensitive data into an HTTP web page, that data is transmitted in cleartext and can be read by anyone.</p>
+          <p class="card-text"><strong class="text-uppercase">Impact: </strong>It is performed by displaying an invisible page or HTML element, inside an iframe, which can be vulnerable for Clickjacking.</p>
+          <p class="card-text"><strong class="text-uppercase">Recommendation: </strong>Depending on the application, an attacker might carry out the following types of attacks. Such as, Cross-site scripting attack, which can lead to session hijacking and and malicious redirect attacks via the location header.</p>
+
+        </div>
+      </div>
+      </div>
+      </div>
+      </div>
+        {% endif %}
+                
+
+
+
+
+              
+                
+
+                
+                
+            </div>
+        </div>
+        </div>
+</div>
+{% include 'includes/footer.html' %} 
+{% endblock content %}

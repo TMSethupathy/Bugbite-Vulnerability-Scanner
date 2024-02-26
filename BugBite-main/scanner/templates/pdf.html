@@ -1,0 +1,390 @@
+<style type="text/css">
+	body {
+		font-weight: 200;
+		font-size: 14px;
+	}
+	.header {
+		font-size: 20px;
+		font-weight: 100;
+		text-align: center;
+		color: #007cae;
+	}
+	.title {
+		font-size: 22px;
+		font-weight: 100;
+		padding: 10px 20px 0px 20px;  
+	}
+	.title span {
+		color: #007cae;
+	}
+	.details {
+		padding: 10px 20px 0px 20px;
+		text-align: left !important;
+	}
+	.hrItem {
+		border: none;
+		height: 1px;
+		/* Set the hr color */
+		color: #333; /* old IE */
+		background-color: #fff; /* Modern Browsers */
+	}
+	.port table th,td{
+		text-align: center;
+		border: 1px solid black;
+		padding: 0.5em;
+	}
+	.port table{
+		border-collapse: collapse;
+		width: 100%;
+		margin-bottom: 1em;
+	}
+	.port table th {
+		background-color: green;
+		font-weight: bold;
+		color: #fff;
+		font-size: 13px;
+	}
+	.bugbite{
+		text-align: center;
+		font-weight: 600;
+		border-bottom: 1px solid red;
+	}
+	hr{
+		border-bottom: 1px solid red;
+	}
+	.table-container {
+		padding: 10px;
+		margin: 10px;
+		margin-bottom: 30px;
+	}
+
+	.table-container table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	.table-container th, td {
+		border: 1px solid black;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.table-container th {
+		background-color: #4CAF50;
+		color: white;
+	}
+	.vuln-name{
+        padding: 15px;
+        background-color: green;
+        border: 1px solid black;
+        font-weight: bold;
+        color: white;
+        text-align: center;
+        font-size: 20px;
+		text-transform: uppercase;
+
+    }
+    .vuln-details{
+        font-size: 17px;
+    }
+    b{
+        display: block;
+		font-weight: bold;
+		text-decoration: underline;
+
+    }
+	ul{
+		margin-top: 10px;
+	}
+	ul li{
+		list-style-type: none;
+	}
+
+
+
+
+</style>
+<h1 class="bugbite">BugBite Scanner Report</h1>
+{% if target_details %}
+<div class='header'>
+	<p class='title'>TARGET INFORMATION</p>
+</div>
+<table class="table-container">
+	<tr>
+		<th>TARGET NAME</th>
+		<td>{{ target_details.domain_name }}</td>
+	</tr>
+	<tr>
+		<th>TARGET IP</th>
+		<td>{{ target_details.ip }}</td>
+	</tr>
+	<tr>
+		<th>TARGET DESCRIPTION</th>
+		<td>{{ details.description }}</td>
+	</tr>
+	<tr>
+		<th>TARGET DATE</th>
+		<td>{{ target_details.report_date }}</td>
+	</tr>
+</table>
+{% endif %}
+{% if os_information %}
+<div class='header'>
+	<p class='title'>OS INFORMATION</p>
+</div>
+
+<table class="table-container">
+	<tr>
+		<th>OS NAME</th>
+		<th>OS ACCURACY</th>
+		<th>OS FAMILY</th>
+		<th>OS TYPE</th>
+		<th>OS VENDOR</th>
+		
+	</tr>
+	{% for os in os_information %}
+	<tr>
+		
+		
+		<td>{{ os.os_name }}</td>
+		<td>{{ os.accuracy }}</td>
+		<td>{{ os.os_family }}</td>
+		<td>{{ os.os_type }}</td>
+		<td>{{ os.vendor }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endif %}
+	{% if service_details %}
+	<div class='header'>
+        <p class='title'>PORT VULNERABILITY</p>
+    </div>
+	<div class="port">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 70px;" >NAME</th>
+                    <th style="width: 70px;">PORT</th>
+                    <th>PRODUCT - VERSION</th>
+                    <th>SCRIPT NAME</th>
+                    <th>SCRIPT DATA</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in service_details %}
+                <tr>
+                    {% if result.name %}
+                    <td>{{ result.name }}</td>
+                  {% else %}
+                    <td>Unknown</td>
+                  {% endif %}  
+                  {% if result.port %}
+                    <td>{{ result.port }}</td>
+                  {% else %}
+                    <td>Unknown</td>
+                  {% endif %}  
+                  {% if result.product or result.version %}
+                    <td>{{ result.product|default:"Unknown" }} -  {{ result.version|default:"Unknown" }} </td>
+                  {% else %}
+                    <td>Unknown</td>
+                  {% endif %}
+                  {% if result.script_name %}
+                    <td>{{ result.script_name }}</td>
+                  {% else %}
+                    <td>Unknown</td>
+                  {% endif %}
+                  {% if result.script_data %}
+                    <td>{{ result.script_data }}</td>
+                  {% else %}
+                    <td>Unknown</td>
+                  {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+	{% endif %}
+
+
+
+{% if 'sqli_scan' in scan_result_dict or 'lfi_scan' in scan_result_dict or 'xss_scan' in scan_result_dict  %}
+<div class='wrapper'>
+	<div class='header'>
+		<p class='title'>High Level</p>
+	</div>
+</div>
+  {% if 'sqli_scan' in scan_result_dict %}
+  <h2 class="vuln-name">SQL Injection</h2>
+  <p><b>URL: </b></p>
+	<ul>
+	  {% for scan_result in scan_result_dict.sqli_scan %}
+		<li>{{ scan_result }}</li>
+	  {% endfor %}
+	</ul>
+	<p class="vuln-details"><b>DESCRIPTION: </b>SQL injection is a vulnerability that allows an attacker to alter backend SQL statements by manipulating the user input. An SQL injection occurs when web applications accept user input that is directly placed into a SQL statement and doesn\'t properly filter out dangerous characters.</p>
+<p class="vuln-details"><b>IMPACT: </b>An attacker may attack /steal your confidential database, which surely will harm the clients.</p>
+<p class="vuln-details"><b>RECOMMENDATION: </b>Your script should filter metacharacters and not allow any other query to proceed.</p>
+
+  {% endif %}
+
+  {% if 'lfi_scan' in scan_result_dict %}
+  <h2 class="vuln-name">LFI</h2>
+  <p><b>URL: </b></p>
+	<ul>
+	  {% for scan_result in scan_result_dict.lfi_scan %}
+		<li>{{ scan_result }}</li>
+	  {% endfor %}
+	</ul>
+	<p class="vuln-details"><b>DESCRIPTION: </b>Sanitizing user input, ensure you have a pre-defined list of both expected and acceptable characters.</p>
+	<p class="vuln-details"><b>IMPACT: </b>Gather usernames via/etc/passwd file Harvest useful information from the log files such as /apache/logs/error.log or /apache/logs/access.log Remotely execute commands via combining this vulnerability with some of other attack vectors such as file upload vulnerability or log injection.</p>
+	<p class="vuln-details"><b>RECOMMENDATION: </b>Ifi possible, do not permit file paths to be appended directly. Make them hard-coded or selectable from a limited hard-coded path list via an index variable 2 :If you definitely need dynamic path concatenation, ensure that you only accept required characters such as a-Z0-9 and do not allow .., /, %00 (null byte) or any other similar unexpected characters.</p>
+
+  {% endif %}
+
+  {% if 'xss_scan' in scan_result_dict %}
+  <h2 class="vuln-name">Cross Site Scripting (XSS)</h2>
+  <p><b>URL: </b></p>
+	<ul>
+	  {% for scan_result in scan_result_dict.xss_scan %}
+		<li>{{ scan_result }}</li>
+	  {% endfor %}
+	</ul>
+	<p class="vuln-details"><b>DESCRIPTION: </b>Cross-Site Scripting (XSS) attacks are a type of injection, in which malicious scripts are injected into otherwise benign and trusted websites. XSS attacks occur when an attacker uses a web application to send malicious code, generally in the form of a browser side script, to a different end user.</p>
+	<p class="vuln-details"><b>IMPACT: </b>Cross-site scripting (XSS) vulnerabilities continue to remain a major threat to web applications as attackers exploiting XSS attacks can gain control of the user’s account and steal personal information such as passwords, bank account numbers, credit card info, personally identifiable information (PII), social security numbers, and more.</p>
+	<p class="vuln-details"><b>RECOMMENDATION: </b>Sanitizing an input field or validating that the data is in the proper form, ensures that only expected content can be submitted by your visitors.</p>
+
+  {% endif %}
+  {% endif %}
+
+{% if 'csrf_scan' in scan_result_dict or 'dir_trav_scan' in scan_result_dict or 'url_redir_scan' in scan_result_dict or 'iframe_scan' in scan_result_dict %}
+  <div class='wrapper'>
+	<div class='header'>
+		<p class='title'>Medium Level</p>
+	</div>
+</div>
+
+  {% if 'csrf_scan' in scan_result_dict %}
+  <h2 class="vuln-name">Cross-Site Request Forgery (CSRF)</h2>
+  <p><b>URL: </b></p>
+	<ul>
+	  {% for scan_result in scan_result_dict.csrf_scan %}
+		<li>{{ scan_result }}</li>
+	  {% endfor %}
+	</ul>
+	<p class="vuln-details"><b>DESCRIPTION: </b>Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on a web application in which they’re currently authenticated. An attacker may trick the users of a web application into executing actions of the attacker’s choosing.</p>
+    <p class="vuln-details"><b>IMPACT: </b>A successful CSRF attack can force the user to perform state changing requests like transferring funds, changing their email address, and so forth. If the victim is an administrative account, CSRF can compromise the entire web application.</p>
+    <p class="vuln-details"><b>RECOMMENDATION: </b>To prevent from csrf attack token(code) should be generated in the backend while filling the form which make sures that token is specific for the authorized users.</p>
+
+  {% endif %}
+
+  {% if 'dir_trav_scan' in scan_result_dict %}
+  <h2 class="vuln-name">Directory Traversal</h2>
+  <p><b>URL: </b></p>
+	<ul>
+	  {% for scan_result in scan_result_dict.dir_trav_scan %}
+		<li>{{ scan_result }}</li>
+	  {% endfor %}
+	</ul>
+	<p class="vuln-details"><b>DESCRIPTION: </b>Directory traversal is an attack which allows attackers to access restricted directories and execute commands outside of the web server\'s root directory.</p>
+    <p class="vuln-details"><b>IMPACT: </b>If a web server or web application is vulnerable to directory traversal attack, the attacker can exploit the vulnerability to reach the root directory and access restricted files and directories.</p>
+    <p class="vuln-details"><b>RECOMMENDATION: </b>To avoid from getting accessed by the attacker. Message will be displayed of access denied with different error.</p>
+
+  {% endif %}
+
+  {% if 'url_redir_scan' in scan_result_dict %}
+  <h2 class="vuln-name">URL Redirection</h2>
+  <p><b>URL: </b></p>
+  <ul>
+	{% for scan_result in scan_result_dict.url_redir_scan %}
+	  <li>{{ scan_result }}</li>
+	{% endfor %}
+  </ul>
+  <p class="vuln-details"><b>DESCRIPTION: </b>URL Redirection is a vulnerability which allows an attacker to force users of your application to an untrusted external site.The attack is most often performed by delivering a link to the victim, who then clicks the link and is unknowingly redirected to the malicious website.</p>
+  <p class="vuln-details"><b>IMPACT: </b>URL Redirection attack may assist an attacker to conduct phishing attacks, trojan distribution, spammers.</p>
+  <p class="vuln-details"><b>RECOMMENDATION: </b>To minimize the risk of unwanted redirects, avoid user-controllable data in URLs where possible and carefully sanitize it when it must be used.</p>
+
+{% endif %}
+
+
+{% if 'iframe_scan' in scan_result_dict %}
+<h2 class="vuln-name">Clickjacking</h2>
+<p><b>URL: </b></p>
+<ul>
+  {% for scan_result in scan_result_dict.iframe_scan %}
+	<li>{{ scan_result }}</li>
+  {% endfor %}
+</ul>
+<p class="vuln-details"><b>DESCRIPTION: </b>Clickjacking is an attack that tricks a user into clicking a webpage element which is invisible or disguised as another element. This can cause users to unwittingly download malware, visit malicious web pages, provide credentials or sensitive information, transfer money, or purchase products online.</p>
+<p class="vuln-details"><b>IMPACT: </b>It is performed by displaying an invisible page or HTML element, inside an iframe, which can be vulnerable for Clickjacking.</p>
+<p class="vuln-details"><b>RECOMMENDATION: </b>To avoid from this attack X-Frame-Options response header is passed as part of the HTTP response of a web page, indicating whether or not a browser should be allowed to render a page inside a FRAME or IFRAME tag.</p>
+
+{% endif %}
+{% endif %}
+
+{% if 'robots_scan' in scan_result_dict or 'sitemap_scan' in scan_result_dict or 'auto_comp_scan' in scan_result_dict or 'http_scan' in scan_result_dict  %}
+<div class='wrapper'>
+	<div class='header'>
+		<p class='title'>Low Level</p>
+	</div>
+</div>
+{% if 'robots_scan' in scan_result_dict %}
+<h2 class="vuln-name">Robots.txt</h2>
+<p><b>URL: </b></p>
+<ul>
+  {% for scan_result in scan_result_dict.robots_scan %}
+	<li>{{ scan_result }}</li>
+  {% endfor %}
+</ul>
+<p class="vuln-details"><b>DESCRIPTION: </b>Robots.txt file tells search engine crawlers that which pages or files the crawler can or can\'t request from your site.</p>
+<p class="vuln-details"><b>IMPACT: </b>Web developer or web admin thinks that robots.txt is only to tell web crawlers what to look and what to avoid. But they also have to take care that if the attacker accessed the robots.txt file, he can now easily accessed your main page also.</p>
+<p class="vuln-details"><b>RECOMMENDATION: </b>Robot.txt is not a vulnerability, but it is to ensure that administrators should review the contents of the robots.txt file to check if the information is consistent with the policies of their organization.</p>
+
+{% endif %}
+
+
+{% if 'sitemap_scan' in scan_result_dict %}
+<h2 class="vuln-name">Sitemap</h2>
+<p><b>URL: </b></p>
+<ul>
+{% for scan_result in scan_result_dict.sitemap_scan %}
+  <li>{{ scan_result }}</li>
+{% endfor %}
+</ul>
+<p class="vuln-details"><b>DESCRIPTION: </b>A sitemap is a file where you provide information about the pages, videos, and other files on your site, and the relationships between them. You can use a sitemap to provide information about specific types of content on your pages, including video and image content.</p>
+<p class="vuln-details"><b>IMPACT: </b>Open Policy Crossdomain.xml file allows other SWF files to make HTTP requests to your web server and see its response. For which using an insecure cross-domain policy file could lead to exploit your site to various attacks.</p>
+<p class="vuln-details"><b>RECOMMENDATION: </b>To evaluate which sites will be allowed to make cross-domain calls. Consider network topology and any authentication mechanisms that will be affected by the configuration or implementation of the cross-domain policy.</p>
+
+{% endif %}
+
+
+		  
+{% if 'auto_comp_scan' in scan_result_dict %}
+	<h3 class="vuln-name">AutoComplete</h3>
+	<p><b>URL: </b></p>
+<ul>
+{% for scan_result in scan_result_dict.auto_comp_scan %}
+<li>{{ scan_result }}</li>
+{% endfor %}
+</ul>
+<p class="vuln-details"><b>DESCRIPTION: </b>Whenever we login/signup with the username and password in any of the form , the browser asks from the user to save it. From this an attacker with local access could obtain the clear text password from the browser cache.</p>
+<p class="vuln-details"><b>IMPACT: </b>The user entered its data in these fields might be sensitive and the attacker can steal them from the browser cache.</p>
+<p class="vuln-details"><b>RECOMMENDATION: </b>To avoid stealing users\' sensitive data, the password autocomplete should be disabled in sensitive applications. To disable autocomplete, use TYPE=password AUTOCOMPLETE=off</p>
+
+{% endif %}
+
+		
+{% if 'http_scan' in scan_result_dict %}
+	<h3 class="vuln-name">HTTP</h3>
+<ul>
+{% for scan_result in scan_result_dict.http_scan %}
+<li>{{ scan_result }}</li>
+{% endfor %}
+</ul>
+
+<p class="vuln-details"><b>DESCRIPTION: </b> In terms of security, HTTP is completely fine when browsing the web. It only becomes an issue when you\'re entering sensitive data into form fields on a website. If you\'re entering sensitive data into an HTTP web page, that data is transmitted in cleartext and can be read by anyone.</p>
+<p class="vuln-details"><b>IMPACT: </b>It is performed by displaying an invisible page or HTML element, inside an iframe, which can be vulnerable for Clickjacking.</p>
+<p class="vuln-details"><b>RECOMMENDATION: </b>Depending on the application, an attacker might carry out the following types of attacks. Such as, Cross-site scripting attack, which can lead to session hijacking and and malicious redirect attacks via the location header</p>
+{% endif %}
+
+{% endif %}

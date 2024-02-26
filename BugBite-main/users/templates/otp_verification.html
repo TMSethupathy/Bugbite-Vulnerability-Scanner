@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="Description" content="Enter your description here"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<title>OTP</title>
+</head>
+<body>
+  {% include 'includes/header.html' %}
+
+      <div class="container">
+        <div class="registration mx-auto d-block w-50">
+          <div class="page-header text-center mt-5">
+            <h1 class="text-primary">OTP Verification</h1>
+          </div>
+          
+          <form method="post" class="form-validate form-horizontal well" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset>
+              <div class="form-group">
+                <label for="">OTP: </label>
+                {{ form.otp }}
+                {% if messages %}
+                <ul class="messages">
+                  {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              </div>
+              
+                  <button type="submit" class="btn btn-primary">Verify OTP</button>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+</body>
+</html>

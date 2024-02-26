@@ -1,0 +1,403 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>BugBite Report</title>
+        <style type="text/css">
+            body {
+                font-weight: 200;
+                font-size: 14px;
+            }
+            .header {
+                font-size: 20px;
+                font-weight: 100;
+                text-align: center;
+                color: #007cae;
+            }
+            .title {
+                font-size: 22px;
+                font-weight: 100;
+                padding: 10px 20px 0px 20px;  
+            }
+            .title span {
+                color: #007cae;
+            }
+            .details {
+                padding: 10px 20px 0px 20px;
+                text-align: left !important;
+            }
+            .hrItem {
+                border: none;
+                height: 1px;
+                /* Set the hr color */
+                color: #333; /* old IE */
+                background-color: #fff; /* Modern Browsers */
+            }
+            .port table th,td{
+                text-align: center;
+                border: 1px solid black;
+                padding: 0.5em;
+            }
+            .port table{
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 1em;
+            }
+            .port table th {
+                width: 30%;
+                background-color: green;
+                font-weight: bold;
+                color: #fff;
+                font-size: 13px;
+            }
+            .bugbite{
+                text-align: center;
+                font-weight: 600;
+                border-bottom: 1px solid red;
+            }
+            hr{
+                border-bottom: 1px solid red;
+            }
+            .table-container {
+                padding: 10px;
+                margin: 10px;
+                margin-bottom: 30px;
+            }
+
+            .table-container table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            .table-container th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: center;
+            }
+
+            .table-container th {
+                background-color: #4CAF50;
+                color: white;
+            }
+            .vuln-name{
+                padding: 15px;
+                background-color: green;
+                border: 1px solid black;
+                font-weight: bold;
+                color: white;
+                text-align: center;
+                font-size: 20px;
+
+            }
+            .vuln-details{
+                font-size: 17px;
+                font-weight: bold;
+                text-decoration: underline;
+            }
+            b{
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="bugbite">BugBite Scanner Report</h1>
+        {% if website_results %}
+        <div class='header'>
+            <p class='title'>TARGET INFORMATION</p>
+        </div>
+            {% for website_result in website_results %}
+                
+           
+            <table class="table-container">
+                <tr>
+                    <th>TARGET NAME</th>
+                    <td>{{ website_result.domain_name }}</td>
+                </tr>
+                <tr>
+                    <th>TARGET IP</th>
+                    <td>{{ website_result.ip }}</td>
+                </tr>
+                <tr>
+                    <th>TARGET DESCRIPTION</th>
+                    <td>{{ website_result.description }}</td>
+                </tr>
+                <tr>
+                    <th>TARGET DATE</th>
+                    <td>{{ website_result.Report_Date }}</td>
+                </tr>
+            </table>
+
+            {% endfor%}
+        
+        {% endif %}
+
+    {% if os_results%}
+    <div class='header'>
+        <p class='title'>OS INFORMATION</p>
+    </div>
+        
+          <table class="table-container">
+            <tr>
+                <th>OS NAME</th>
+                <th>OS ACCURACY</th>
+                <th>OS FAMILY</th>
+                <th>OS TYPE</th>
+                <th>OS VENDOR</th>
+                
+            </tr>
+            {% for os in os_results %}
+            <tr>
+               
+                <td>{{ os.OSName }}</td>
+                <td>{{ os.Accuracy }}</td>
+                <td>{{ os.OSFamily }}</td>
+                <td>{{ os.Type }}</td>
+                <td>{{ os.Vendor }}</td>
+            </tr>
+            {% endfor %} 
+        </table>
+         
+      {% endif %}
+
+
+        {% if results %}
+        <div class='wrapper'>
+            <div class='header'>
+                <p class='title'>Port vulnerability Scan</p>
+            </div>
+        </div>
+        <div class="port">
+            {% for result in results %}
+        <table>
+                
+                <tr>
+                    <th scope="col">NAME</th>
+                    {% if result.name %}
+                        <td>{{ result.name }}</td>
+                    {% else %}
+                        <td>Unknown</td>
+                    {% endif %}  
+
+                    
+                    
+                   
+                </tr>
+                
+                <tr>
+                    <th scope="col">PORT</th>
+                    {% if result.port %}
+                        <td>{{ result.port }}</td>
+                    {% else %}
+                        <td>Unknown</td>
+                    {% endif %}  
+                </tr>
+                <tr>
+                    <th scope="col">PRODUCT - VERSION</th>
+                    {% if result.product or result.version %}
+                        <td>{{ result.product|default:"Unknown" }} -  {{ result.version|default:"Unknown" }} </td>
+                    {% else %}
+                        <td>Unknown</td>
+                    {% endif %}
+
+                </tr>
+                <tr>
+                    <th scope="col">SCRIPT NAME</th>
+                    {% if result.script_name %}
+                        <td>{{ result.script_name }}</td>
+                    {% else %}
+                        <td>Unknown</td>
+                    {% endif %}
+
+                </tr>
+                <tr>
+                <th scope="col">SCRIPT DATA</th>
+                  {% if result.script_data %}
+                  <td>{{ result.script_data }}</td>
+                {% else %}
+                  <td>Unknown</td>
+                {% endif %}
+
+                </tr>
+                
+        </table>
+        {% endfor %}
+    </div>
+        {% endif %}
+
+        <!-- High Level -->
+        {% if sqliUrl or lfiUrl or xssUrl %}
+        <div class='wrapper'>
+            <div class='header'>
+                <p class='title'>High Level</p>
+            </div>
+        </div>
+        {% if sqliUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{sqliVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{sqliUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{sqliDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{sqliImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{sqliRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if xssUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{xssVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{xssUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{xssDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{xssImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{xssRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if lfiUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{lfiVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{lfiUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{lfiDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{lfiImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{lfiRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+        <hr class='hrItem' />
+        {% endif %}
+
+        <!-- Medium Level -->
+        {% if csrfUrl or directoryUrl or urlRedirectionUrl or iframeUrl %}
+        <div class='wrapper'>
+            <div class='header'>
+                <p class='title'>Medium Level</p>
+            </div>
+        </div>
+        {% if csrfUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{csrfVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{csrfUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{csrfDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{csrfImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{csrfRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if directoryUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{directoryVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{directoryUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{directoryDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{directoryImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{directoryRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if urlRedirectionUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{urlRedirectionVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{urlRedirectionUrl}}<br/><br/>
+                <b class="vuln-details">Description:</b> {{urlRedirectionDescription}}<br/><br/>
+                <b class="vuln-details">Impact:</b> {{urlRedirectionImpact}}<br/><br/>
+                <b class="vuln-details">Recommendation:</b> {{urlRedirectionRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if iframeUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{iframeVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{iframeUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{iframeDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{iframeImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{iframeRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+        <hr class='hrItem' />
+        {% endif %}
+
+        <!-- Low Level -->
+        {% if robotsUrl or autoCompleteUrl or siteMapXmlUrl or httpUrl %}
+        <div class='wrapper'>
+            <div class='header'>
+                <p class='title'>Low Level</p>
+            </div>
+        </div>
+        {% if robotsUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{robotsVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{robotsUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{robotsDescription}}<br/>
+                <b  class="vuln-details">Impact:</b> {{robotsImpact}}<br/>
+                <b  class="vuln-details">Recommendation:</b> {{robotsRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if siteMapXmlUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{siteMapXmlVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{siteMapXmlUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{siteMapXmlDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{siteMapXmlImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{siteMapXmlRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if autoCompleteUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{autoCompleteVulnerability}}</h3>
+                <b class="vuln-details">URL:</b> {{autoCompleteUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{autoCompleteDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{autoCompleteImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{autoCompleteRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+
+        {% if httpUrl %}
+        <div>
+            <div class='details'>
+                <h3 class="vuln-name">{{httpVulnerability}}</h3>
+                <b class="vuln-details">Traffic</b> {{httpUrl}}<br/>
+                <b class="vuln-details">Description:</b> {{httpDescription}}<br/>
+                <b class="vuln-details">Impact:</b> {{httpImpact}}<br/>
+                <b class="vuln-details">Recommendation:</b> {{httpRecommendation}}
+                <!-- <hr class='hrItem' /> -->
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        {% if not sqliUrl and not lfiUrl and not xssUrl and not csrfUrl and not directoryUrl and not urlRedirectionUrl and not iframeUrl and not robotsUrl and not autoCompleteUrl and not siteMapXmlUrl and not httpUrl %}
+        <div class='wrapper'>
+            <div class='header'>
+                <p class='title'>Your site is save. No vulnerability found in there. </p>
+            </div>
+        </div>
+        {% endif %}
+    </body>
+</html>

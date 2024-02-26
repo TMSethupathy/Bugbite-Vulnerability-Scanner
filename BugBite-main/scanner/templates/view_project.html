@@ -1,0 +1,46 @@
+{% extends 'includes/base.html' %}
+{% block content %}
+
+    {% include 'includes/uheader.html' %} 
+
+    <div class="row w-100">
+        <div class="col col-md-3 col-lg-1">{% include 'includes/usidebar.html' %}</div>
+        <div class="mt-5 col-12 col-md-9 col-sm-12 mx-lg-auto mx-sm-auto col-lg-11">
+            <div class="container center">
+                <div class="table-responsive">
+                    <table class=" text-center table table-hover table-bordered">
+                        <tr>
+                            <th>S.NO</th>
+                            <th>PROJECT NAME</th>
+                            <th>DOMAIN NAME</th>
+                            <th>DESCRIPTION</th>
+                            <th>CREATE DATE</th>
+                            <th>VIEW</th>
+                            <th>DELETE</th>
+                        <tr>    
+                            {% for project in projects %}
+                                {% for target in project.targetdetails_set.all %}
+                            <tr>
+                                
+                                <td>{{ forloop.parentloop.counter }}</td>
+                                <td>{{ project.projectname }}</td>
+                                <td>{{ target.domain_name }}</td>
+                                <td>{{ project.description }}</td>
+                                <td>{{ target.report_date }}</td>
+                                <td><button class="btn btn-primary"><a class="text-white" href="{% url 'view_details' project.id %}">view</a></button></td>
+                                <td><button  class="btn btn-danger"><a  class="text-white" href="{% url 'delete_project' project.id %}">DELETE</a></button></td>
+                            </tr>
+                                {% endfor %}
+                            {% endfor %}
+    
+                    </table>
+            
+    
+    </div>
+            </div>
+            </div>
+            </div>
+
+
+
+{% endblock content %}
